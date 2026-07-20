@@ -1,9 +1,13 @@
+import sys
 import os
 import streamlit as st
-import requests
 import pandas as pd
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+# Root directory ka path add kar rahe hain taaki backend folder import ho sake
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Direct Backend functions import karo
+from backend.sql_agent import run_pipeline, is_query_ambiguous
 
 st.set_page_config(page_title="NeuralSQL Agent", page_icon="🤖", layout="wide")
 
