@@ -3,7 +3,10 @@ import json
 import sqlite3
 import pandas as pd
 from groq import Groq
-from db_setup import get_schema, DB_NAME
+from backend.db_setup import get_schema, DB_NAME
+# from db_setup import get_schema, DB_NAME
+
+
 
 LOG_FILE = "agent_logs.jsonl"
 
