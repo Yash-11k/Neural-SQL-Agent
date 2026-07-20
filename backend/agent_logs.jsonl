@@ -1,0 +1,11 @@
+{"question": "Show all orders", "success": true, "attempts": 1}
+{"question": "List customers from Delhi ", "success": true, "attempts": 1}
+{"question": "List customers from Rohtak", "success": true, "attempts": 1}
+{"question": "Find total amount spent by customers ", "success": true, "attempts": 2}
+{"question": "Find total amount spent by customer 1", "success": true, "attempts": 1}
+{"question": "Find total amount spent by customer 3", "success": true, "attempts": 1}
+{"question": "Show all orders ", "success": true, "attempts": 1}
+{"question": "Show total order amount for each customer", "success": true, "attempts": 1}
+{"question": "show all orders ", "success": true, "attempts": 1}
+{"question": "show all orders > 7000", "success": true, "attempts": 1}
+{"question": "show all orders > 7000000", "success": true, "attempts": 1}
