@@ -121,6 +121,7 @@ def generator_agent(user_question, error_feedback=None):
         
     return clean_sql
 # Main function running the pipeline
+# Main function running the pipeline
 def run_pipeline(user_question):
     result = {
         "question": user_question,
@@ -139,35 +140,50 @@ def run_pipeline(user_question):
         # 2. Review with Critic Agent
         critic_res = critic_agent(user_question, sql)
 
-        result["steps"].append({
+        # Step append karo
+        step_info = {
             "attempt": attempt,
             "sql": sql,
             "critic": critic_res
-        })
+        }
 
         # If critic rejects, retry
         if not critic_res.get("approved"):
             last_error = critic_res.get("reason")
+            result["steps"].append(step_info)
             continue
 
         # 3. Safety check
         if not sql.upper().startswith("SELECT"):
             last_error = "Only SELECT queries are allowed for security."
+            step_info["critic"]["reason"] = last_error
+            result["steps"].append(step_info)
             continue
 
         # 4. Try running in SQLite
         try:
-            # Absolute path / DB verification
-            db_path = DB_NAME if os.path.exists(DB_NAME) else os.path.join(os.path.dirname(__file__), DB_NAME)
+            # Current working directory Path Resolution
+            cwd = os.getcwd()
+            possible_paths = [
+                os.path.join(cwd, DB_NAME),
+                os.path.join(cwd, "backend", DB_NAME),
+                os.path.join(os.path.dirname(__file__), DB_NAME)
+            ]
             
-            # Agar file exist nahi karti ya empty hai, toh auto-build kar do!
-            if not os.path.exists(db_path):
+            db_path = None
+            for p in possible_paths:
+                if os.path.exists(p):
+                    db_path = p
+                    break
+            
+            # Agar file kahin nahi mili toh create karo
+            if not db_path:
                 make_database()
-                db_path = DB_NAME if os.path.exists(DB_NAME) else os.path.join(os.path.dirname(__file__), DB_NAME)
-            
+                db_path = DB_NAME
+
             conn = sqlite3.connect(db_path)
             
-            # Verify if tables actually exist
+            # Ensure tables actually exist
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='orders';")
             if not cursor.fetchone():
@@ -181,11 +197,14 @@ def run_pipeline(user_question):
             # Success!
             result["success"] = True
             result["data"] = df.to_dict(orient="records")
+            result["steps"].append(step_info)
             break  # Stop loop
 
         except Exception as err:
-            last_error = f"Database Execution Error: {str(err)}"
-            print("DB Error:", err)
+            last_error = f"Database Execution Exception: {str(err)}"
+            step_info["critic"]["approved"] = False
+            step_info["critic"]["reason"] = last_error
+            result["steps"].append(step_info)
 
     # Save telemetry log
     write_log(user_question, result["success"], len(result["steps"]))
