@@ -3,7 +3,7 @@
 An enterprise-grade Natural Language to SQL generation platform powered by Agentic AI (Llama 3 via Groq), FastAPI, and Docker.
 
 **Author:** Yash
-
+**Live App:** https://neuralsql-agent.streamlit.app/
 ---
 
 ## ✨ Key Features
