@@ -1,10 +1,11 @@
 import sys
 import os
+
+# Root directory ko Python path me add kar rahe hain taaki backend folder import ho sake
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import streamlit as st
 import pandas as pd
-
-# Root directory ka path add kar rahe hain taaki backend folder import ho sake
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Direct Backend functions import
 from backend.sql_agent import run_pipeline, is_query_ambiguous
