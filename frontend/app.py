@@ -37,24 +37,30 @@ if st.button("Run Query 🚀", type="primary"):
     if user_question.strip():
         with st.spinner("Executing query via AI Pipeline..."):
             try:
-                # Direct function call (No FastAPI / Render needed!)
                 result = run_pipeline(user_question)
                 
-                # Check if result is returned successfully
-                if result:
-                    st.success("Query Executed Successfully!")
-                    
-                    # Agar result pandas DataFrame hai ya list of dicts:
-                    if isinstance(result, pd.DataFrame):
-                        st.dataframe(result, use_container_width=True)
-                    elif isinstance(result, list) and len(result) > 0:
-                        df = pd.DataFrame(result)
+                # Check if result is a dict and has 'success' key
+                if isinstance(result, dict):
+                    if result.get("success") and result.get("data"):
+                        st.success("Query Executed Successfully! 🎉")
+                        
+                        # SQL Query dikhao
+                        steps = result.get("steps", [])
+                        if steps:
+                            last_sql = steps[-1].get("sql")
+                            st.code(last_sql, language="sql")
+                        
+                        # Data Table dikhao
+                        df = pd.DataFrame(result.get("data"))
                         st.dataframe(df, use_container_width=True)
                     else:
-                        st.info("Query ran successfully, but returned 0 rows or plain output:")
-                        st.write(result)
+                        st.error("Agent query execution complete nahi kar paya.")
+                        
+                        # Debugging ke liye JSON expander me rakho
+                        with st.expander("🔍 View Debug Logs (JSON)"):
+                            st.json(result)
                 else:
-                    st.error("Query Execution Failed or returned empty output!")
+                    st.write(result)
                     
             except Exception as e:
                 st.error(f"Error running pipeline: {e}")
