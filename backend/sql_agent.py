@@ -154,7 +154,10 @@ def run_pipeline(user_question):
 
         # 4. Try running in SQLite
         try:
-            conn = sqlite3.connect(DB_NAME)
+            # Absolute path or fallback to DB_NAME
+            db_path = DB_NAME if os.path.exists(DB_NAME) else os.path.join(os.path.dirname(__file__), DB_NAME)
+            
+            conn = sqlite3.connect(db_path)
             df = pd.read_sql_query(sql, conn)
             conn.close()
 
@@ -164,7 +167,8 @@ def run_pipeline(user_question):
             break  # Stop loop
 
         except Exception as err:
-            last_error = str(err)
+            last_error = f"Database Execution Error: {str(err)}"
+            print("DB Error:", err)
 
     # Save telemetry log
     write_log(user_question, result["success"], len(result["steps"]))

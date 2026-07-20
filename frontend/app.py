@@ -39,7 +39,7 @@ if st.button("Run Query 🚀", type="primary"):
             try:
                 result = run_pipeline(user_question)
                 
-                # Check if result is a dict and has 'success' key
+                # Check if result is a dict
                 if isinstance(result, dict):
                     if result.get("success") and result.get("data"):
                         st.success("Query Executed Successfully! 🎉")
@@ -55,6 +55,13 @@ if st.button("Run Query 🚀", type="primary"):
                         st.dataframe(df, use_container_width=True)
                     else:
                         st.error("Agent query execution complete nahi kar paya.")
+                        
+                        # ⚠️ EXACT FAIL REASON DIKHEGA HERE
+                        steps = result.get("steps", [])
+                        if steps:
+                            last_reason = steps[-1].get("critic", {}).get("reason")
+                            if last_reason:
+                                st.warning(f"⚠️ Fail Reason: {last_reason}")
                         
                         # Debugging ke liye JSON expander me rakho
                         with st.expander("🔍 View Debug Logs (JSON)"):
