@@ -3,7 +3,7 @@ import json
 import sqlite3
 import pandas as pd
 from groq import Groq
-from backend.db_setup import get_schema, DB_NAME
+from backend.db_setup import get_schema, DB_NAME, make_database
 
 LOG_FILE = "agent_logs.jsonl"
 
@@ -154,10 +154,24 @@ def run_pipeline(user_question):
 
         # 4. Try running in SQLite
         try:
-            # Absolute path or fallback to DB_NAME
+            # Absolute path / DB verification
             db_path = DB_NAME if os.path.exists(DB_NAME) else os.path.join(os.path.dirname(__file__), DB_NAME)
             
+            # Agar file exist nahi karti ya empty hai, toh auto-build kar do!
+            if not os.path.exists(db_path):
+                make_database()
+                db_path = DB_NAME if os.path.exists(DB_NAME) else os.path.join(os.path.dirname(__file__), DB_NAME)
+            
             conn = sqlite3.connect(db_path)
+            
+            # Verify if tables actually exist
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='orders';")
+            if not cursor.fetchone():
+                conn.close()
+                make_database()
+                conn = sqlite3.connect(db_path)
+
             df = pd.read_sql_query(sql, conn)
             conn.close()
 
