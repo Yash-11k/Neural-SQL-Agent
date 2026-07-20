@@ -85,18 +85,23 @@ def generator_agent(user_question, error_feedback=None):
 
     extra_msg = ""
     if error_feedback:
-        extra_msg = f"Your previous SQL attempt failed with error: {error_feedback}. Please fix it!"
+        extra_msg = f"CRITICAL: Your previous SQL attempt was REJECTED with error: '{error_feedback}'. Fix the column names and table names strictly based on the schema!"
 
     system_prompt = f"""
     You are an expert Text-to-SQL assistant.
-    Generate ONLY ONE valid SQLite query for this schema:
+    Generate ONLY ONE valid SQLite query for this EXACT schema:
     {get_schema()}
 
-    CRITICAL INSTRUCTIONS:
-    - Return ONLY the executable SQL query.
-    - Do NOT write multiple SQL statements.
-    - Do NOT include markdown blocks like ```sql or ```.
-    - Do NOT add any explanations.
+    EXACT SCHEMA REFERENCE (DO NOT CHANGE COLUMN NAMES):
+    - Table: customers (cust_id, name, city)
+    - Table: products (product_id, item_name, category, price)
+    - Table: orders (order_id, cust_id, product_id, amount)
+
+    CRITICAL RULES:
+    1. NEVER use 'customer_id', use 'cust_id'.
+    2. NEVER use 'product', use 'product_id'.
+    3. Return ONLY the raw executable SQL query without markdown blocks (no ```sql).
+    4. Do NOT write multiple SQL statements or extra explanations.
     {extra_msg}
     """
 
@@ -111,12 +116,10 @@ def generator_agent(user_question, error_feedback=None):
     raw_sql = response.choices[0].message.content.strip()
     clean_sql = raw_sql.replace("```sql", "").replace("```", "").strip()
     
-    # Take only the first query if multiple statements are generated
     if ";" in clean_sql:
         clean_sql = clean_sql.split(";")[0] + ";"
         
     return clean_sql
-
 # Main function running the pipeline
 def run_pipeline(user_question):
     result = {
