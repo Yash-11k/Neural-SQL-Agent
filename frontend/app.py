@@ -1,27 +1,27 @@
 import sys
 import os
 
-# Root directory ko Python path me add kar rahe hain taaki backend folder import ho sake
+# Root directory to add in python paath
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import streamlit as st
 import pandas as pd
 
-# Direct Backend functions import
+# Direct Backend functions import else there will be ambiguty
 from backend.sql_agent import run_pipeline, is_query_ambiguous
 
 st.set_page_config(page_title="NeuralSQL Agent", page_icon="🤖", layout="wide")
 
-# Sidebar
-st.sidebar.title("📊 System Telemetry")
+# Sidebar for better ui 
+st.sidebar.title(" System Telemetry")
 
-if st.sidebar.button("🔄 Refresh App"):
+if st.sidebar.button(" Refresh App"):
     st.rerun()
 
-st.sidebar.info("Status: Direct Pipeline Active ⚡")
+st.sidebar.info("Status: Direct Pipeline Active ")
 
 st.sidebar.divider()
-st.sidebar.markdown("### 🗄️ Database Schema")
+st.sidebar.markdown("###  Database Schema")
 st.sidebar.code("""
 customers (cust_id, name, city)
 products  (product_id, item_name, category, price)
@@ -29,21 +29,21 @@ orders    (order_id, cust_id, product_id, amount)
 """, language="sql")
 
 # Main Page
-st.title("🤖 NeuralSQL Agent")
+st.title(" NeuralSQL Agent")
 st.caption("Natural Language to SQL Engine Powered by Groq AI")
 
 user_question = st.text_input("Apna query likho:", placeholder="e.g. Show all products with price > 500")
 
-if st.button("Run Query 🚀", type="primary"):
+if st.button("Run Query ", type="primary"):
     if user_question.strip():
         with st.spinner("Executing query via AI Pipeline..."):
             try:
                 result = run_pipeline(user_question)
                 
-                # Check if result is a dict
+                # Check if result is a dictonary
                 if isinstance(result, dict):
                     if result.get("success") and result.get("data"):
-                        st.success("Query Executed Successfully! 🎉")
+                        st.success("Query Executed Successfully! ")
                         
                         # SQL Query dikhao
                         steps = result.get("steps", [])
@@ -57,15 +57,15 @@ if st.button("Run Query 🚀", type="primary"):
                     else:
                         st.error("Agent query execution complete nahi kar paya.")
                         
-                        # ⚠️ EXACT FAIL REASON DIKHEGA HERE
+                        # identify reason why query is failing 
                         steps = result.get("steps", [])
                         if steps:
                             last_reason = steps[-1].get("critic", {}).get("reason")
                             if last_reason:
-                                st.warning(f"⚠️ Fail Reason: {last_reason}")
+                                st.warning(f" Fail Reason: {last_reason}")
                         
-                        # Debugging ke liye JSON expander me rakho
-                        with st.expander("🔍 View Debug Logs (JSON)"):
+                        # for easy debugging json exapnder 
+                        with st.expander(" View Debug Logs (JSON)"):
                             st.json(result)
                 else:
                     st.write(result)
