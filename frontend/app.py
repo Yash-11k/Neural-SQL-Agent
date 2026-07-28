@@ -32,7 +32,7 @@ orders    (order_id, cust_id, product_id, amount)
 st.title(" NeuralSQL Agent")
 st.caption("Natural Language to SQL Engine Powered by Groq AI")
 
-user_question = st.text_input("Apna query likho:", placeholder="e.g. Show all products with price > 500")
+user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500")
 
 if st.button("Run Query ", type="primary"):
     if user_question.strip():
