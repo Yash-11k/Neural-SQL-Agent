@@ -38,7 +38,7 @@ def is_query_ambiguous(user_question):
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )
@@ -69,7 +69,7 @@ def critic_agent(user_question, sql_code):
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )
@@ -106,7 +106,7 @@ def generator_agent(user_question, error_feedback=None):
     """
 
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+       model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_question}

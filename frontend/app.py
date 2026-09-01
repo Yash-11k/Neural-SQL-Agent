@@ -55,7 +55,7 @@ if st.button("Run Query ", type="primary"):
                         df = pd.DataFrame(result.get("data"))
                         st.dataframe(df, use_container_width=True)
                     else:
-                        st.error("Agent query execution complete nahi kar paya.")
+                        st.error("Agent query can not be executed .")
                         
                         # identify reason why query is failing 
                         steps = result.get("steps", [])
