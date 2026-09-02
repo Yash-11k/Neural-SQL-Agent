@@ -7,6 +7,10 @@ from backend.db_setup import get_schema, DB_NAME, make_database
 
 LOG_FILE = "agent_logs.jsonl"
 
+# Groq deprecated llama-3.1-8b-instant and llama-3.3-70b-versatile on 2026-08-16.
+# openai/gpt-oss-120b is Groq's recommended replacement (better reasoning, still fast).
+MODEL_NAME = "openai/gpt-oss-120b"
+
 # Helper function to write log line
 def write_log(question, success, attempts):
     info = {
@@ -38,7 +42,7 @@ def is_query_ambiguous(user_question):
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=MODEL_NAME,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )
@@ -69,7 +73,7 @@ def critic_agent(user_question, sql_code):
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=MODEL_NAME,
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"}
         )
@@ -106,7 +110,7 @@ def generator_agent(user_question, error_feedback=None):
     """
 
     response = client.chat.completions.create(
-       model="llama-3.3-70b-versatile",
+        model=MODEL_NAME,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_question}
@@ -120,7 +124,7 @@ def generator_agent(user_question, error_feedback=None):
         clean_sql = clean_sql.split(";")[0] + ";"
         
     return clean_sql
-# Main function running the pipeline
+
 # Main function running the pipeline
 def run_pipeline(user_question):
     result = {
