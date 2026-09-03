@@ -48,6 +48,7 @@ def make_database():
         (2, "Aaman Sharma", "Delhi"),
         (3, "Rohan Verma", "Mumbai"),
         (4, "Priya Singh", "Bangalore")
+        (5, "Kamal", "Pune")
     ]
     cursor.executemany("INSERT INTO customers VALUES (?, ?, ?)", customers_list)
 
@@ -56,7 +57,8 @@ def make_database():
         (101, "Laptop", "Electronics", 60000),
         (102, "Phone", "Electronics", 25000),
         (103, "Shoes", "Fashion", 3000),
-        (104, "Chair", "Furniture", 5000)
+        (104, "Chair", "Furniture", 5000),
+        (105, "Table", "Furniture", 7000)
     ]
     cursor.executemany("INSERT INTO products VALUES (?, ?, ?, ?)", products_list)
 
@@ -66,6 +68,7 @@ def make_database():
         (2, 1, 103, 3000),  # Yash bought Shoes
         (3, 2, 102, 25000), # Aaman bought Phone
         (4, 3, 104, 5000)   # Rohan bought Chair
+        (5,1,105, 7000) # Kamal Bought Table
     ]
     cursor.executemany("INSERT INTO orders VALUES (?, ?, ?, ?)", orders_list)
 
