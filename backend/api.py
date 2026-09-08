@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
-from sql_agent import run_pipeline, is_query_ambiguous
-from analytics import get_telemetry_metrics
-from db_setup import make_database
+from backend.sql_agent import run_pipeline, is_query_ambiguous
+from backend.analytics import get_telemetry_metrics
+from backend.db_setup import make_database, load_csv_to_db, get_dynamic_schema
 
 app = FastAPI(title="NeuralSQL Simple API")
 
@@ -26,3 +26,14 @@ def ask_endpoint(data: QueryInput):
 @app.get("/analytics")
 def analytics_endpoint():
     return get_telemetry_metrics()
+
+@app.post("/upload-csv")
+def upload_csv_endpoint(file: UploadFile = File(...)):
+    # UploadFile.file is a file-like object - pandas can read it directly,
+    # same as load_csv_to_db already expects from Streamlit's uploader.
+    table_name, columns = load_csv_to_db(file.file, table_name="user_data")
+    return {
+        "table_name": table_name,
+        "columns": columns,
+        "schema": get_dynamic_schema()
+    }

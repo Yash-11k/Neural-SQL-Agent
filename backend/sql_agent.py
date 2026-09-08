@@ -3,7 +3,7 @@ import json
 import sqlite3
 import pandas as pd
 from groq import Groq
-from backend.db_setup import get_schema, DB_NAME, make_database
+from backend.db_setup import get_schema, get_dynamic_schema, DB_NAME, make_database
 
 LOG_FILE = "agent_logs.jsonl"
 
@@ -34,7 +34,7 @@ def is_query_ambiguous(user_question):
     prompt = f"""
     Is this user question ambiguous for database text-to-SQL?
     Question: "{user_question}"
-    Schema: {get_schema()}
+    Schema: {get_dynamic_schema()}
 
     Reply in JSON format:
     {{"ambiguous": true or false, "question": "clarification question if true, else null"}}
@@ -60,11 +60,11 @@ def critic_agent(user_question, sql_code):
     You are a lenient database reviewer.
     User Question: {user_question}
     Generated SQL: {sql_code}
-    Database Schema: {get_schema()}
+    Database Schema: {get_dynamic_schema()}
 
     Rules:
     1. If the SQL query is a valid SELECT query and roughly answers the question, APPROVE IT.
-    2. Do NOT reject queries like 'SELECT * FROM products;' or 'SELECT * FROM orders;' if they simply ask for all items/orders.
+    2. Do NOT reject queries that simply ask for all rows from a table (e.g. 'SELECT * FROM <table>;').
     3. Reject ONLY if there are critical syntax errors or totally wrong table/column names that don't exist in the schema.
 
     Reply in JSON format:
@@ -91,21 +91,24 @@ def generator_agent(user_question, error_feedback=None):
     if error_feedback:
         extra_msg = f"CRITICAL: Your previous SQL attempt was REJECTED with error: '{error_feedback}'. Fix the column names and table names strictly based on the schema!"
 
+    # Schema is now pulled LIVE from whatever tables exist in the SQLite
+    # file (sample e-commerce tables and/or an uploaded CSV table).
+    # No hardcoded table/column names here anymore - the schema text below
+    # IS the source of truth the model must follow.
+    current_schema = get_dynamic_schema()
+
     system_prompt = f"""
     You are an expert Text-to-SQL assistant.
-    Generate ONLY ONE valid SQLite query for this EXACT schema:
-    {get_schema()}
+    Generate ONLY ONE valid SQLite query using EXACTLY the tables and
+    columns listed in this schema (do not invent table or column names
+    that are not listed here):
 
-    EXACT SCHEMA REFERENCE (DO NOT CHANGE COLUMN NAMES):
-    - Table: customers (cust_id, name, city)
-    - Table: products (product_id, item_name, category, price)
-    - Table: orders (order_id, cust_id, product_id, amount)
+    {current_schema}
 
     CRITICAL RULES:
-    1. NEVER use 'customer_id', use 'cust_id'.
-    2. NEVER use 'product', use 'product_id'.
-    3. Return ONLY the raw executable SQL query without markdown blocks (no ```sql).
-    4. Do NOT write multiple SQL statements or extra explanations.
+    1. Use table and column names EXACTLY as they appear in the schema above.
+    2. Return ONLY the raw executable SQL query without markdown blocks (no ```sql).
+    3. Do NOT write multiple SQL statements or extra explanations.
     {extra_msg}
     """
 
