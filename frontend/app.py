@@ -13,7 +13,7 @@ import requests
 from backend.sql_agent import run_pipeline
 from backend.db_setup import load_csv_to_db, get_dynamic_schema
 
-st.set_page_config(page_title="NeuralSQL Agent", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NeuralSQL Agent", page_icon="", layout="wide")
 
 # Where the FastAPI backend lives when it IS running (local dev / Docker).
 # Override with an env var if you deploy the API somewhere else.
@@ -76,7 +76,7 @@ else:
 st.sidebar.divider()
 
 # --- CSV Upload Section ---
-st.sidebar.markdown("### 📂 Upload Your Own Data")
+st.sidebar.markdown("###  Upload Your Own Data")
 uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
 
 if uploaded_file is not None:
@@ -95,7 +95,7 @@ st.sidebar.code(get_dynamic_schema(), language="sql")
 
 # Main Page
 st.title(" NeuralSQL Agent")
-st.caption("Natural Language to SQL Engine Powered by Groq AI")
+st.caption("Natural Language to SQL Engine Powered by Groq AI API")
 
 user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500")
 
@@ -139,4 +139,4 @@ if st.button("Run Query ", type="primary"):
             except Exception as e:
                 st.error(f"Error running pipeline: {e}")
     else:
-        st.warning("Pehle question toh type karo!")
+        st.warning("Write your question first!")
