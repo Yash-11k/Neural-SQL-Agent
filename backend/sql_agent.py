@@ -83,7 +83,7 @@ def critic_agent(user_question, sql_code):
         return {"approved": True, "reason": None}
 
 # Agent 1: SQL Generator Agent
-def generator_agent(user_question, error_feedback=None):
+def generator_agent(user_question, error_feedback=None, preferred_table=None):
     api_key = os.environ.get("GROQ_API_KEY")
     client = Groq(api_key=api_key)
 
@@ -97,6 +97,18 @@ def generator_agent(user_question, error_feedback=None):
     # IS the source of truth the model must follow.
     current_schema = get_dynamic_schema()
 
+    # If the user has recently uploaded a CSV, we know its table name
+    # (app.py passes it through). Without this hint, the LLM sees ALL
+    # tables (sample data + upload) with equal weight and often defaults
+    # to the sample e-commerce tables instead of the user's own data.
+    priority_msg = ""
+    if preferred_table:
+        priority_msg = f"""
+    IMPORTANT: The user has just uploaded their own data as table '{preferred_table}'.
+    Use '{preferred_table}' to answer this question UNLESS the question explicitly
+    asks about customers, products, or orders (the built-in sample tables).
+    """
+
     system_prompt = f"""
     You are an expert Text-to-SQL assistant.
     Generate ONLY ONE valid SQLite query using EXACTLY the tables and
@@ -104,7 +116,7 @@ def generator_agent(user_question, error_feedback=None):
     that are not listed here):
 
     {current_schema}
-
+    {priority_msg}
     CRITICAL RULES:
     1. Use table and column names EXACTLY as they appear in the schema above.
     2. Return ONLY the raw executable SQL query without markdown blocks (no ```sql).
@@ -129,7 +141,7 @@ def generator_agent(user_question, error_feedback=None):
     return clean_sql
 
 # Main function running the pipeline
-def run_pipeline(user_question):
+def run_pipeline(user_question, preferred_table=None):
     result = {
         "question": user_question,
         "steps": [],
@@ -142,7 +154,7 @@ def run_pipeline(user_question):
     # Retry loop (Maximum 3 attempts)
     for attempt in range(1, 4):
         # 1. Generate SQL
-        sql = generator_agent(user_question, error_feedback=last_error)
+        sql = generator_agent(user_question, error_feedback=last_error, preferred_table=preferred_table)
 
         # 2. Review with Critic Agent
         critic_res = critic_agent(user_question, sql)

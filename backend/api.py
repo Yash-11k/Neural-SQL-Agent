@@ -9,6 +9,7 @@ app = FastAPI(title="NeuralSQL Simple API")
 # Input model
 class QueryInput(BaseModel):
     question: str
+    table_name: str | None = None  # hint: which table to prioritize (e.g. an uploaded CSV)
 
 # Build database automatically on start
 @app.on_event("startup")
@@ -21,7 +22,7 @@ def check_ambiguity_endpoint(data: QueryInput):
 
 @app.post("/ask")
 def ask_endpoint(data: QueryInput):
-    return run_pipeline(data.question)
+    return run_pipeline(data.question, preferred_table=data.table_name)
 
 @app.get("/analytics")
 def analytics_endpoint():

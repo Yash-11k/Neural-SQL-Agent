@@ -13,7 +13,7 @@ import requests
 from backend.sql_agent import run_pipeline
 from backend.db_setup import load_csv_to_db, get_dynamic_schema
 
-st.set_page_config(page_title="NeuralSQL Agent", page_icon="", layout="wide")
+st.set_page_config(page_title="NeuralSQL Agent", page_icon="🤖", layout="wide")
 
 # Where the FastAPI backend lives when it IS running (local dev / Docker).
 # Override with an env var if you deploy the API somewhere else.
@@ -21,7 +21,7 @@ API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 API_TIMEOUT = 20  # seconds - LLM calls can take a few seconds
 
 
-def run_query(question):
+def run_query(question, preferred_table=None):
     """
     Tries the FastAPI backend first (real HTTP call to /ask).
     If that fails for ANY reason (server not running, network error,
@@ -32,13 +32,13 @@ def run_query(question):
     try:
         response = requests.post(
             f"{API_BASE_URL}/ask",
-            json={"question": question},
+            json={"question": question, "table_name": preferred_table},
             timeout=API_TIMEOUT
         )
         response.raise_for_status()
         return response.json(), "API"
     except requests.exceptions.RequestException:
-        return run_pipeline(question), "Direct"
+        return run_pipeline(question, preferred_table=preferred_table), "Direct"
 
 
 def upload_csv(file):
@@ -76,7 +76,7 @@ else:
 st.sidebar.divider()
 
 # --- CSV Upload Section ---
-st.sidebar.markdown("###  Upload Your Own Data")
+st.sidebar.markdown("### 📂 Upload Your Own Data")
 uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
 
 if uploaded_file is not None:
@@ -84,6 +84,7 @@ if uploaded_file is not None:
         try:
             table_name, columns, mode = upload_csv(uploaded_file)
             st.session_state["last_uploaded_name"] = uploaded_file.name
+            st.session_state["active_table"] = table_name  # remember for query hints
             st.sidebar.success(f"Loaded '{uploaded_file.name}' as table '{table_name}' (via {mode})")
         except Exception as e:
             st.sidebar.error(f"Could not load CSV: {e}")
@@ -95,7 +96,7 @@ st.sidebar.code(get_dynamic_schema(), language="sql")
 
 # Main Page
 st.title(" NeuralSQL Agent")
-st.caption("Natural Language to SQL Engine Powered by Groq AI API")
+st.caption("Natural Language to SQL Engine Powered by Groq AI")
 
 user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500")
 
@@ -103,7 +104,8 @@ if st.button("Run Query ", type="primary"):
     if user_question.strip():
         with st.spinner("Executing query via AI Pipeline..."):
             try:
-                result, mode = run_query(user_question)
+                preferred_table = st.session_state.get("active_table")
+                result, mode = run_query(user_question, preferred_table=preferred_table)
                 st.session_state["last_mode"] = mode
 
                 # Check if result is a dictonary
@@ -139,4 +141,4 @@ if st.button("Run Query ", type="primary"):
             except Exception as e:
                 st.error(f"Error running pipeline: {e}")
     else:
-        st.warning("Write your question first!")
+        st.warning("Pehle question toh type karo!")
