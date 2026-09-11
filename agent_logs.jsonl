@@ -13,3 +13,6 @@
 {"question": "show all orders", "success": true, "attempts": 1}
 {"question": "show all orders", "success": true, "attempts": 1}
 {"question": "show all data ", "success": true, "attempts": 1}
+{"question": "show all data ", "success": true, "attempts": 1}
+{"question": "show all data from user_data", "success": true, "attempts": 1}
+{"question": "show all data ", "success": true, "attempts": 1}
