@@ -76,7 +76,7 @@ else:
 st.sidebar.divider()
 
 # --- CSV Upload Section ---
-st.sidebar.markdown("### 📂 Upload Your Own Data")
+st.sidebar.markdown("###  Upload Your Own Data")
 uploaded_file = st.sidebar.file_uploader("Upload a CSV file", type="csv")
 
 if uploaded_file is not None:
@@ -141,4 +141,4 @@ if st.button("Run Query ", type="primary"):
             except Exception as e:
                 st.error(f"Error running pipeline: {e}")
     else:
-        st.warning("Pehle question toh type karo!")
+        st.warning("Write your question first!")

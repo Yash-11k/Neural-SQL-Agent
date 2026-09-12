@@ -47,7 +47,7 @@ def make_database():
     customers_list = [
         (1, "Yash Kagra", "Rohtak"),
         (2, "Aaman Sharma", "Delhi"),
-        (3, "Rohan Verma", "Mumbai"),
+        (3, "Rohan Verma", "Gurgaon"),
         (4, "Priya Singh", "Bangalore")
     ]
     cursor.executemany("INSERT INTO customers VALUES (?, ?, ?)", customers_list)
