@@ -57,7 +57,13 @@ def make_database():
         (101, "Laptop", "Electronics", 60000),
         (102, "Phone", "Electronics", 25000),
         (103, "Shoes", "Fashion", 3000),
-        (104, "Chair", "Furniture", 5000)
+        (104, "Chair", "Furniture", 5000),
+        (105, "Table", "Furniture", 7000),
+        (106, "Headphones", "Electronics", 1500),
+        (107, "Jacket", "Fashion", 4000),
+        (108, "Watch", "Fashion", 8000),
+        (109, "Backpack", "Fashion", 2000),
+        (110, 'Monitor', 'Eletronics', 45000)
     ]
     cursor.executemany("INSERT INTO products VALUES (?, ?, ?, ?)", products_list)
 

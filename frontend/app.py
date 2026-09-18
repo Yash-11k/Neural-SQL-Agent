@@ -13,7 +13,7 @@ import requests
 from backend.sql_agent import run_pipeline
 from backend.db_setup import load_csv_to_db, get_dynamic_schema
 
-st.set_page_config(page_title="NeuralSQL Agent", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="NeuralSQL Agent", page_icon=".", layout="wide")
 
 # Where the FastAPI backend lives when it IS running (local dev / Docker).
 # Override with an env var if you deploy the API somewhere else.
@@ -98,7 +98,7 @@ st.sidebar.code(get_dynamic_schema(), language="sql")
 st.title(" NeuralSQL Agent")
 st.caption("Natural Language to SQL Engine Powered by Groq AI")
 
-user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500")
+user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500 or write any english question to get SQL query for your database")
 
 if st.button("Run Query ", type="primary"):
     if user_question.strip():
