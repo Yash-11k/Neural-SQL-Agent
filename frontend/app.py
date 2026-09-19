@@ -91,12 +91,12 @@ if uploaded_file is not None:
 
 st.sidebar.divider()
 
-st.sidebar.markdown("###  Database Schema")
+st.sidebar.markdown("##  Database Schema")
 st.sidebar.code(get_dynamic_schema(), language="sql")
 
 # Main Page
 st.title(" NeuralSQL Agent")
-st.caption("Natural Language to SQL Engine Powered by Groq AI")
+st.caption("Natural Language to SQL Engine Powered by Groq API AI")
 
 user_question = st.text_input("Write your query:", placeholder="e.g. Show all products with price > 500 or write any english question to get SQL query for your database")
 
