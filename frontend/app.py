@@ -139,6 +139,6 @@ if st.button("Run Query ", type="primary"):
                     st.write(result)
                     
             except Exception as e:
-                st.error(f"Error running pipeline: {e}")
+                st.error(f"Error running Pipeline: {e}")
     else:
         st.warning("Write your question first!")
