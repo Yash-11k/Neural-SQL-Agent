@@ -35,3 +35,5 @@ def save_query(question, sql, execution_time, success):
 
 def get_history():
     return load_history()
+
+
