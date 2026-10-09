@@ -133,7 +133,8 @@ python -m streamlit run app.py
 
 ---
 
-## 🗄️ Database Schema Reference
+## 🗄️ Database Schema Reference also updating with dynamic schema
+
 
 - **customers**: `cust_id` (PK), `name`, `city`
 - **products**: `product_id` (PK), `item_name`, `category`, `price`
